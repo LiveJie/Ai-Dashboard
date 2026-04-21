@@ -2,9 +2,11 @@ const fs = require('fs')
 const path = require('path')
 
 class ComponentGenerator {
-  constructor(specPath, outputPath) {
+  constructor(specPath, outputPath, options = {}) {
     this.specPath = specPath
     this.outputPath = outputPath
+    this.options = options
+    this.stats = { created: 0, overwritten: 0, skipped: 0 }
     this.templates = {
       page: this.loadTemplate('page.js'),
       dashboardPage: this.loadTemplate('dashboard-page.js'),
@@ -209,12 +211,12 @@ class ComponentGenerator {
     imports += `  Typography,\n`
     imports += `  CircularProgress,\n`
     imports += `  Alert,\n`
-      imports += `  Chip,\n`
-      imports += `  FormControl,\n`
-      imports += `  InputLabel,\n`
-      imports += `  MenuItem,\n`
-      imports += `  Select,\n`
-      imports += `  Stack,\n`
+    imports += `  Chip,\n`
+    imports += `  FormControl,\n`
+    imports += `  InputLabel,\n`
+    imports += `  MenuItem,\n`
+    imports += `  Select,\n`
+    imports += `  Stack,\n`
     imports += `  Table,\n`
     imports += `  TableBody,\n`
     imports += `  TableCell,\n`
@@ -310,13 +312,33 @@ class ComponentGenerator {
     files.forEach((file) => {
       const fullPath = path.join(file.directory, file.fileName)
 
+      if (this.options && this.options.target) {
+        if (this.options.target.startsWith('frontend') === false) return
+        const specificTarget = this.options.target.split('/')[1]
+        if (specificTarget && file.fileName.indexOf(specificTarget) === -1) {
+          return // 跳过非目标
+        }
+      }
+
+      if (fs.existsSync(fullPath) && (!this.options || !this.options.force)) {
+        if (this.stats) this.stats.skipped++
+        return
+      }
+
       // 确保目录存在
       if (!fs.existsSync(file.directory)) {
         fs.mkdirSync(file.directory, { recursive: true })
       }
 
+      const isExist = fs.existsSync(fullPath)
+
       // 写入文件
       fs.writeFileSync(fullPath, file.content, 'utf8')
+
+      if (this.stats) {
+        if (isExist) this.stats.overwritten++
+        else this.stats.created++
+      }
       console.log(`Generated: ${fullPath}`)
     })
   }

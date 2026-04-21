@@ -2,11 +2,13 @@ const fs = require('fs')
 const path = require('path')
 
 class ModelGenerator {
-  constructor(specPath, outputPath, config) {
+  constructor(specPath, outputPath, config, options = {}) {
     this.specPath = specPath
     this.outputPath = outputPath
     this.config = config || {}
     this.orm = this.config.framework?.backend?.orm || 'Mongoose'
+    this.options = options
+    this.stats = { created: 0, overwritten: 0, skipped: 0 }
 
     this.templates = {
       mongoose: this.loadTemplate('mongoose-model.js'),
@@ -290,9 +292,28 @@ class ModelGenerator {
         fs.mkdirSync(file.directory, { recursive: true })
       }
 
+      if (this.options && this.options.target) {
+        if (this.options.target.startsWith('backend') === false) return
+        const specificTarget = this.options.target.split('/')[1]
+        if (specificTarget && file.fileName.indexOf(specificTarget) === -1) {
+          return // 跳过非目标
+        }
+      }
+
+      if (fs.existsSync(fullPath) && (!this.options || !this.options.force)) {
+        if (this.stats) this.stats.skipped++
+        return
+      }
+
+      const isExist = fs.existsSync(fullPath)
       // 写入文件
       fs.writeFileSync(fullPath, file.content, 'utf8')
-      console.log(`Generated: ${fullPath}`)
+
+      if (this.stats) {
+        if (isExist) this.stats.overwritten++
+        else this.stats.created++
+      }
+      console.log(`✓ 生成后端文件: ${file.fileName}`)
     })
   }
 }

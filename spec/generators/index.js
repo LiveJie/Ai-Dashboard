@@ -5,12 +5,33 @@ const ComponentGenerator = require('./frontend/component-generator')
 const SqlGenerator = require('./backend/sql-generator')
 
 class SpecCodeGenerator {
-  constructor(specPath, outputPath) {
+  constructor(specPath, outputPath, options = {}) {
     this.specPath = specPath
     this.outputPath = outputPath
-    this.modelGenerator = new ModelGenerator(specPath, path.join(outputPath, 'backend'))
-    this.componentGenerator = new ComponentGenerator(specPath, path.join(outputPath, 'frontend'))
-    this.sqlGenerator = new SqlGenerator(specPath, path.join(outputPath, 'backend', 'sql'))
+    this.options = {
+      force: options.force || false,
+      target: options.target || null, // 比如 'frontend', 'backend', 'frontend/dashboard'
+      ...options,
+    }
+    this.stats = { created: 0, overwritten: 0, skipped: 0 }
+
+    // 初始化生成器时传入 options 让他们知道是否要跳过文件
+    this.modelGenerator = new ModelGenerator(
+      specPath,
+      path.join(outputPath, 'backend'),
+      {},
+      this.options,
+    )
+    this.componentGenerator = new ComponentGenerator(
+      specPath,
+      path.join(outputPath, 'frontend'),
+      this.options,
+    )
+    this.sqlGenerator = new SqlGenerator(
+      specPath,
+      path.join(outputPath, 'backend', 'sql'),
+      this.options,
+    )
   }
 
   async generate() {
@@ -28,7 +49,13 @@ class SpecCodeGenerator {
         this.specPath,
         path.join(this.outputPath, 'backend'),
         systemConfig,
+        this.options,
       )
+
+      // 共享 stats
+      this.modelGenerator.stats = this.stats
+      this.componentGenerator.stats = this.stats
+      this.sqlGenerator.stats = this.stats
 
       // 从 OpenAPI 规范中提取 schemas
       const schemas = this.extractSchemasFromOpenApi(openapi)
@@ -47,6 +74,7 @@ class SpecCodeGenerator {
       await this.generateMainFiles(systemConfig)
 
       console.log('代码生成完成！')
+      return this.stats
     } catch (error) {
       console.error('代码生成失败:', error)
       throw error
@@ -931,6 +959,50 @@ ${systemConfig.description || '一个为 AI 原生开发设计的专业仪表板
     return str
       .replace(/(?:^|[\s-_])(\w)/g, (_, c) => c.toUpperCase())
       .replace(/^./, (c) => c.toLowerCase())
+  }
+
+  writeFile(directory, fileName, content, type = '') {
+    // 检查是否在目标范围
+    if (this.options && this.options.target) {
+      const isFrontendTarget =
+        this.options.target.startsWith('frontend') && directory.includes('frontend')
+      const isBackendTarget =
+        this.options.target.startsWith('backend') && directory.includes('backend')
+      const specificTarget = this.options.target.split('/')[1]
+
+      if (!isFrontendTarget && !isBackendTarget) {
+        return // 完全不在大类目标里
+      }
+
+      // 如果指定了具体文件(如 dashboard)
+      if (
+        specificTarget &&
+        fileName.indexOf(specificTarget) === -1 &&
+        directory.indexOf(specificTarget) === -1
+      ) {
+        return
+      }
+    }
+
+    if (!fs.existsSync(directory)) {
+      fs.mkdirSync(directory, { recursive: true })
+    }
+    const filePath = path.join(directory, fileName)
+
+    // 安全模式检查
+    if (fs.existsSync(filePath) && (!this.options || !this.options.force)) {
+      if (this.stats) this.stats.skipped++
+      return // 存在则跳过
+    }
+
+    fs.writeFileSync(filePath, content, 'utf8')
+
+    if (this.stats) {
+      if (fs.existsSync(filePath)) this.stats.overwritten++
+      else this.stats.created++
+    }
+
+    console.log(`✓ 生成文件: ${path.relative(path.join(this.outputPath, '..'), filePath)}`)
   }
 
   ensureDirectoryExists(filePath) {

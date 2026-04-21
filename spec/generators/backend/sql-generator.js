@@ -2,9 +2,11 @@ const fs = require('fs')
 const path = require('path')
 
 class SqlGenerator {
-  constructor(specPath, outputPath) {
+  constructor(specPath, outputPath, options = {}) {
     this.specPath = specPath
     this.outputPath = outputPath
+    this.options = options
+    this.stats = { created: 0, overwritten: 0, skipped: 0 }
   }
 
   generateInitSql(schemas, systemConfig) {
@@ -51,7 +53,29 @@ SET FOREIGN_KEY_CHECKS = 0;
 
     const sqlPath = path.join(this.outputPath, 'init.sql')
     this.ensureDirectoryExists(sqlPath)
-    fs.writeFileSync(sqlPath, sqlContent)
+
+    // Target 过滤
+    if (this.options && this.options.target) {
+      if (this.options.target.startsWith('backend') === false) return;
+      const specificTarget = this.options.target.split('/')[1];
+      if (specificTarget && 'init.sql'.indexOf(specificTarget) === -1) return;
+    }
+
+    // Safe mode
+    if (fs.existsSync(sqlPath) && (!this.options || !this.options.force)) {
+      if (this.stats) this.stats.skipped++;
+      return sqlPath;
+    }
+
+    const isExist = fs.existsSync(sqlPath);
+    fs.writeFileSync(sqlPath, sqlContent, 'utf8')
+    
+    if (this.stats) {
+      if (isExist) this.stats.overwritten++;
+      else this.stats.created++;
+    }
+    
+    console.log(`Generated: ${sqlPath}`)
     return sqlPath
   }
 
