@@ -1,0 +1,523 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "AI Native Development Dashboard API",
+    "description": "为AI原生开发设计的专业仪表板系统 API 规范",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "/api",
+      "description": "本地开发服务器"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "健康检查",
+        "tags": ["System"],
+        "responses": {
+          "200": {
+            "description": "系统正常运行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "OK" },
+                    "timestamp": { "type": "string", "format": "date-time" },
+                    "uptime": { "type": "number" },
+                    "environment": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai-models": {
+      "get": {
+        "summary": "获取AI模型列表",
+        "tags": ["AI Models"],
+        "x-metadata": {
+          "component": "AIModels",
+          "title": "AI模型管理",
+          "icon": "ApiOutlined"
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 },
+            "description": "页码"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10 },
+            "description": "每页数量"
+          },
+          {
+            "name": "provider",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "提供商过滤"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "状态过滤"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功获取模型列表",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PaginatedAIModelResponse" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "创建AI模型",
+        "tags": ["AI Models"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AIModel" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "成功创建模型",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AIModel" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai-models/{id}": {
+      "get": {
+        "summary": "获取AI模型详情",
+        "tags": ["AI Models"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "模型ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功获取模型详情",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AIModel" }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "更新AI模型",
+        "tags": ["AI Models"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "模型ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AIModel" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功更新模型",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AIModel" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "删除AI模型",
+        "tags": ["AI Models"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "模型ID"
+          }
+        ],
+        "responses": {
+          "200": { "description": "成功删除模型" }
+        }
+      }
+    },
+    "/projects": {
+      "get": {
+        "summary": "获取项目列表",
+        "tags": ["Projects"],
+        "x-metadata": {
+          "component": "Projects",
+          "title": "项目管理",
+          "icon": "AccountTreeOutlined"
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 },
+            "description": "页码"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10 },
+            "description": "每页数量"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功获取项目列表",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PaginatedProjectResponse" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "创建项目",
+        "tags": ["Projects"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Project" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "成功创建项目",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Project" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/projects/{id}": {
+      "get": {
+        "summary": "获取项目详情",
+        "tags": ["Projects"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "项目ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功获取项目详情",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Project" }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "更新项目",
+        "tags": ["Projects"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "项目ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Project" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功更新项目",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Project" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "删除项目",
+        "tags": ["Projects"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "项目ID"
+          }
+        ],
+        "responses": {
+          "200": { "description": "成功删除项目" }
+        }
+      }
+    },
+    "/usage": {
+      "get": {
+        "summary": "获取使用日志",
+        "tags": ["Usage"],
+        "x-metadata": {
+          "component": "Dashboard",
+          "title": "仪表板",
+          "icon": "DashboardOutlined"
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 },
+            "description": "页码"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 50 },
+            "description": "每页数量"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功获取使用日志",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PaginatedUsageLogResponse" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "记录使用日志",
+        "tags": ["Usage"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UsageLog" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "成功记录使用日志",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UsageLog" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/usage/stats": {
+      "get": {
+        "summary": "获取使用统计",
+        "tags": ["Usage"],
+        "responses": {
+          "200": {
+            "description": "成功获取使用统计",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analytics/overview": {
+      "get": {
+        "summary": "获取概览数据",
+        "tags": ["Analytics"],
+        "x-metadata": {
+          "component": "Analytics",
+          "title": "数据分析",
+          "icon": "BarChartOutlined"
+        },
+        "responses": {
+          "200": {
+            "description": "成功获取概览数据",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings": {
+      "get": {
+        "summary": "系统设置",
+        "tags": ["System"],
+        "x-metadata": {
+          "component": "Settings",
+          "title": "系统设置",
+          "icon": "SettingsOutlined"
+        },
+        "responses": {
+          "200": {
+            "description": "成功获取系统设置",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AIModel": {
+        "type": "object",
+        "required": ["name", "modelId", "provider", "version"],
+        "properties": {
+          "name": { "type": "string", "description": "模型名称" },
+          "modelId": { "type": "string", "description": "模型唯一标识符" },
+          "provider": {
+            "type": "string",
+            "enum": ["OpenAI", "Anthropic", "Google", "Meta", "Custom"],
+            "description": "模型提供商"
+          },
+          "version": { "type": "string", "description": "模型版本号" },
+          "description": { "type": "string", "description": "模型描述" },
+          "capabilities": { "type": "array", "items": { "type": "string" } },
+          "status": {
+            "type": "string",
+            "enum": ["active", "deprecated", "alpha", "beta"],
+            "default": "active"
+          },
+          "test_sync_field": { "type": "string", "description": "用于测试自动同步的字段" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Project": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string", "description": "项目名称" },
+          "description": { "type": "string", "description": "项目描述" },
+          "status": {
+            "type": "string",
+            "enum": ["planning", "development", "testing", "deployment", "completed"],
+            "default": "planning"
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "critical"],
+            "default": "medium"
+          },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "UsageLog": {
+        "type": "object",
+        "required": [
+          "projectId",
+          "aiModelId",
+          "requestType",
+          "inputTokens",
+          "outputTokens",
+          "responseTime",
+          "cost"
+        ],
+        "properties": {
+          "projectId": { "type": "string", "description": "项目ID" },
+          "aiModelId": { "type": "string", "description": "AI模型ID" },
+          "requestType": { "type": "string", "description": "请求类型" },
+          "inputTokens": { "type": "integer" },
+          "outputTokens": { "type": "integer" },
+          "responseTime": { "type": "number" },
+          "cost": { "type": "number" },
+          "success": { "type": "boolean", "default": true },
+          "timestamp": { "type": "string", "format": "date-time" }
+        }
+      },
+      "PaginatedAIModelResponse": {
+        "type": "object",
+        "properties": {
+          "items": { "type": "array", "items": { "$ref": "#/components/schemas/AIModel" } },
+          "total": { "type": "integer" },
+          "page": { "type": "integer" },
+          "limit": { "type": "integer" }
+        }
+      },
+      "PaginatedProjectResponse": {
+        "type": "object",
+        "properties": {
+          "items": { "type": "array", "items": { "$ref": "#/components/schemas/Project" } },
+          "total": { "type": "integer" },
+          "page": { "type": "integer" },
+          "limit": { "type": "integer" }
+        }
+      },
+      "PaginatedUsageLogResponse": {
+        "type": "object",
+        "properties": {
+          "items": { "type": "array", "items": { "$ref": "#/components/schemas/UsageLog" } },
+          "total": { "type": "integer" },
+          "page": { "type": "integer" },
+          "limit": { "type": "integer" }
+        }
+      }
+    }
+  }
+}

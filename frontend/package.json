@@ -1,0 +1,40 @@
+{
+  "name": "ai-dashboard-frontend",
+  "version": "1.0.0",
+  "description": "AI Native Development Dashboard Frontend",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "npm run dev"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.14.1",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/icons-material": "^5.16.0",
+    "@mui/material": "^5.16.0",
+    "echarts": "^5.4.3",
+    "recharts": "^2.7.2",
+    "react-query": "^3.39.3",
+    "zustand": "^4.4.1",
+    "axios": "^1.4.0",
+    "dayjs": "^1.11.9"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.3",
+    "vite": "^4.4.5",
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "ai",
+    "dashboard",
+    "react",
+    "mui"
+  ],
+  "author": "AI Development Team",
+  "license": "MIT"
+}

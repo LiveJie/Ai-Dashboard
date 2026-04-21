@@ -1,0 +1,175 @@
+{
+  "name": "AI Native Development Dashboard",
+  "version": "1.0.0",
+  "description": "为AI原生开发设计的专业仪表板系统",
+  "author": "AI Development Team",
+  "license": "MIT",
+
+  "framework": {
+    "backend": {
+      "runtime": "Node.js",
+      "version": "16.0+",
+      "framework": "Express.js",
+      "orm": "Sequelize",
+      "database": "MySQL"
+    },
+    "frontend": {
+      "runtime": "React",
+      "version": "18.0+",
+      "language": "JavaScript",
+      "ui": "MUI",
+      "charts": ["ECharts", "Recharts"],
+      "state": "Zustand",
+      "queries": "React Query"
+    }
+  },
+
+  "features": {
+    "aiModelManagement": {
+      "enabled": true,
+      "description": "AI模型管理功能",
+      "endpoints": [
+        "GET /api/ai-models",
+        "POST /api/ai-models",
+        "PUT /api/ai-models/:id",
+        "DELETE /api/ai-models/:id"
+      ]
+    },
+    "projectManagement": {
+      "enabled": true,
+      "description": "项目管理功能",
+      "endpoints": [
+        "GET /api/projects",
+        "POST /api/projects",
+        "PUT /api/projects/:id",
+        "DELETE /api/projects/:id"
+      ]
+    },
+    "usageAnalytics": {
+      "enabled": true,
+      "description": "使用分析功能",
+      "endpoints": ["GET /api/usage", "POST /api/usage", "GET /api/usage/stats"]
+    },
+    "dataVisualization": {
+      "enabled": true,
+      "description": "数据可视化功能",
+      "charts": ["line", "bar", "pie", "area"]
+    }
+  },
+
+  "authentication": {
+    "enabled": true,
+    "type": "JWT",
+    "expiration": "7d",
+    "refreshToken": true
+  },
+
+  "rateLimit": {
+    "enabled": true,
+    "windowMs": 900000,
+    "max": 100
+  },
+
+  "cors": {
+    "enabled": true,
+    "origin": ["http://localhost:3000"],
+    "credentials": true
+  },
+
+  "logging": {
+    "level": "info",
+    "format": "json",
+    "file": "combined.log"
+  },
+
+  "packageJson": {
+    "main": {
+      "name": "AI Native Development Dashboard",
+      "version": "1.0.0",
+      "description": "为AI原生开发设计的专业仪表板系统",
+      "scripts": {
+        "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+        "dev:backend": "cd backend && npm run dev",
+        "dev:frontend": "cd frontend && npm run dev",
+        "build": "npm run build:backend && npm run build:frontend",
+        "build:backend": "cd backend && npm run build",
+        "build:frontend": "cd frontend && npm run build",
+        "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+        "start": "cd backend && npm start"
+      },
+      "keywords": ["ai", "dashboard", "react", "nodejs"],
+      "author": "AI Development Team",
+      "license": "MIT",
+      "devDependencies": {
+        "concurrently": "^8.2.2"
+      }
+    },
+    "backend": {
+      "name": "ai-dashboard-backend",
+      "version": "1.0.0",
+      "description": "AI Native Development Dashboard Backend",
+      "main": "src/index.js",
+      "scripts": {
+        "dev": "nodemon src/index.js",
+        "start": "node src/index.js",
+        "build": "echo 'No build step required for Node.js backend'"
+      },
+      "dependencies": {
+        "express": "^4.18.2",
+        "cors": "^2.8.5",
+        "helmet": "^7.0.0",
+        "morgan": "^1.10.0",
+        "compression": "^1.7.4",
+        "express-rate-limit": "^6.8.1",
+        "dotenv": "^16.3.1",
+        "sequelize": "^6.32.1",
+        "mysql2": "^3.3.3",
+        "joi": "^17.9.2",
+        "express-validator": "^7.0.1",
+        "bcryptjs": "^2.4.3",
+        "jsonwebtoken": "^9.0.2"
+      },
+      "devDependencies": {
+        "nodemon": "^3.0.1"
+      },
+      "keywords": ["ai", "dashboard", "nodejs", "express"],
+      "author": "AI Development Team",
+      "license": "MIT"
+    },
+    "frontend": {
+      "name": "ai-dashboard-frontend",
+      "version": "1.0.0",
+      "description": "AI Native Development Dashboard Frontend",
+      "private": true,
+      "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview",
+        "start": "npm run dev"
+      },
+      "dependencies": {
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "react-router-dom": "^6.14.1",
+        "@emotion/react": "^11.11.4",
+        "@emotion/styled": "^11.11.5",
+        "@mui/icons-material": "^5.16.0",
+        "@mui/material": "^5.16.0",
+        "echarts": "^5.4.3",
+        "recharts": "^2.7.2",
+        "react-query": "^3.39.3",
+        "zustand": "^4.4.1",
+        "axios": "^1.4.0",
+        "dayjs": "^1.11.9"
+      },
+      "devDependencies": {
+        "@vitejs/plugin-react": "^4.0.3",
+        "vite": "^4.4.5",
+        "nodemon": "^3.0.1"
+      },
+      "keywords": ["ai", "dashboard", "react", "mui"],
+      "author": "AI Development Team",
+      "license": "MIT"
+    }
+  }
+}
