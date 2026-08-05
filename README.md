@@ -12,3 +12,5 @@
 1. 安装依赖: `npm run install:all`
 2. 配置环境变量: 在 `backend/.env` 中设置数据库连接
 3. 启动开发服务器: `npm run dev`
+
+ 
